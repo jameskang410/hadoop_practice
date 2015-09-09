@@ -1,0 +1,52 @@
+---
+  # The name property is used to give a quick description of the task.
+  # It is displayed when the task is run during 'vagrant up'.
+  # The next line after the name property is the Ansible module that will be
+  # used. The properties below that line (indented) are properties of that
+  # specific module.
+  # Techncially, a lot--if not all--of these commands can be done via bash 
+  # commands using the command module (http://docs.ansible.com/command_module.html).
+
+  # The {{ inventory_hostname }} variable refers to the hostname alias that was 
+  # created in the hosts file (in the same directory as the Vagrantfile and
+  # this playbook).
+
+  # Currently setting up ansible to run all of these tasks on all machines. 
+  # Hosts can be edited to include only certain machines/IP addresses/groups.
+  # 'all' can and should be edited later.
+- hosts: all
+
+  tasks:
+    # This task will update everything before moving on.
+    # I think update_cache can technically be run as a part of
+    # the other steps, but it seems helpful to run this at the beginning.
+    - name: updating apt cache
+      apt: update_cache=yes
+      become: yes
+      become_method: sudo
+    # Need to install this in order to add the java repository
+    - name: adding python-software-properties 
+      apt: name=python-software-properties
+      become: yes
+      become_method: sudo
+    # Adds the java repository
+    - name: adding java repository
+      apt_repository: repo='ppa:webupd8team/java'
+      become: yes
+      become_method: sudo
+    # This step takes care of the config menu that pops up when installing
+    # Java. Without this step, Ansible gets hung up and isn't able to install Java.
+    - name: automatically select the Oracle License - 
+      shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+      become: yes
+      become_method: sudo
+    # Actually installing java 8
+    - name: installing java8
+      apt: name=oracle-java8-installer
+      become: yes
+      become_method: sudo
+    # Download hadoop
+    - name: install hadoop
+      get_url: url=http://archive.cloudera.com/cdh4/cdh/4/hadoop-2.0.0-cdh4.7.1.tar.gz dest=/opt
+      become: yes
+      become_method: sudo
