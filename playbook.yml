@@ -47,6 +47,6 @@
       become_method: sudo
     # Download hadoop
     - name: install hadoop
-      get_url: url=http://archive.cloudera.com/cdh4/cdh/4/hadoop-2.0.0-cdh4.7.1.tar.gz dest=/opt
+      get_url: url=http://www.motorlogy.com/apache/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz dest=/usr/local/hadoop
       become: yes
       become_method: sudo
